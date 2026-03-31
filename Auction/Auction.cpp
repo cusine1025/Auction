@@ -1,20 +1,44 @@
-﻿// Auction.cpp : 이 파일에는 'main' 함수가 포함됩니다. 거기서 프로그램 실행이 시작되고 종료됩니다.
-//
+﻿#include <iostream>
+#include  "Drawer.h"
+#include <windows.h>
 
-#include <iostream>
+void FixConsoleSize() {
+    // 1. 현재 콘솔 창의 핸들(ID)을 가져옵니다.
+    HWND hwnd = GetConsoleWindow();
+
+    // 2. 창의 현재 스타일 정보를 가져옵니다.
+    long style = GetWindowLong(hwnd, GWL_STYLE);
+
+    // 3. 스타일에서 '크기 조절(WS_THICKFRAME)'과 '최대화 버튼(WS_MAXIMIZEBOX)' 기능을 뺍니다.
+    style &= ~WS_THICKFRAME;
+    style &= ~WS_MAXIMIZEBOX;
+
+    // 4. 수정한 스타일을 창에 다시 적용합니다.
+    SetWindowLong(hwnd, GWL_STYLE, style);
+
+    // 5. 변경사항을 즉시 반영하여 창을 갱신합니다.
+    SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED);
+}
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    //콘솔 설정
+    SetConsoleTitle(L"레전드 경매 게임");
+    system("mode con:cols=122 lines=55");
+    FixConsoleSize();
+    
+    AuctionSystem* Auction = new AuctionSystem();
+
+    DrawAuctionScreen(Auction);
 }
 
-// 프로그램 실행: <Ctrl+F5> 또는 [디버그] > [디버깅하지 않고 시작] 메뉴
-// 프로그램 디버그: <F5> 키 또는 [디버그] > [디버깅 시작] 메뉴
-
-// 시작을 위한 팁: 
-//   1. [솔루션 탐색기] 창을 사용하여 파일을 추가/관리합니다.
-//   2. [팀 탐색기] 창을 사용하여 소스 제어에 연결합니다.
-//   3. [출력] 창을 사용하여 빌드 출력 및 기타 메시지를 확인합니다.
-//   4. [오류 목록] 창을 사용하여 오류를 봅니다.
-//   5. [프로젝트] > [새 항목 추가]로 이동하여 새 코드 파일을 만들거나, [프로젝트] > [기존 항목 추가]로 이동하여 기존 코드 파일을 프로젝트에 추가합니다.
-//   6. 나중에 이 프로젝트를 다시 열려면 [파일] > [열기] > [프로젝트]로 이동하고 .sln 파일을 선택합니다.
+//게임 흐름
+//1. 게임 시작 - 메인화면
+//1-1. 게임 시작 클릭
+//1-2. 프롤로그 출력
+// - 플레이어가 경매에 참여하게 된 계기를 텍스트로 출력
+//1-3. 플레이어 초기화
+//2. 경매 시스템 시작
+//2-1. 해당 일 아이템 초기화
+//2-2. NPC 초기화
+//2-3. 

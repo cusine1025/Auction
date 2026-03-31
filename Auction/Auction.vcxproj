@@ -124,6 +124,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Auction.cpp" />
+    <ClCompile Include="AuctionSystem.cpp" />
+    <ClCompile Include="Drawer.cpp" />
+    <ClCompile Include="Item.cpp" />
+    <ClCompile Include="NPC.cpp" />
+    <ClCompile Include="Player.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AuctionSystem.h" />
+    <ClInclude Include="Data.h" />
+    <ClInclude Include="Drawer.h" />
+    <ClInclude Include="Item.h" />
+    <ClInclude Include="NPC.h" />
+    <ClInclude Include="Player.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
