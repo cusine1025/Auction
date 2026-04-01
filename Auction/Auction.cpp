@@ -28,9 +28,9 @@ int main()
 	FixConsoleSize();
 	
 	AuctionSystem* Auction = new AuctionSystem();
-
-	//DrawAuctionScreen(Auction);
-	DrawMainMenu();
+	//Auction->StartAuction();
+	DrawAuctionScreen(Auction);
+	//DrawMainMenu();
 }
 
 //게임 흐름

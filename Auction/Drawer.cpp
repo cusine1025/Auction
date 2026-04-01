@@ -1,4 +1,4 @@
-#include "Drawer.h"
+﻿#include "Drawer.h"
 #include "Data.h"
 
 #include <Windows.h>
@@ -151,6 +151,33 @@ void DrawAuctionScreen(AuctionSystem* CurrentAuction)
 	int SlotHeight = 6;
 	for (int i = 0; i < 4; i++) {
 		DrawBox(SlotRow+(i*SlotHeight), 90, SlotWidth, SlotHeight);
+
+		MoveCursor(SlotRow + (i * SlotHeight) + 1, 92);
+		//플레이어 데이터 쓰기
+		if (i == 0) {
+			printf("당신");
+		}
+		//NPC 데이터 쓰기
+		else {
+			printf("NPC%d", i);
+		}
+	}
+
+	//낙찰카드
+	int CardRow = 13;
+	int CardHeight = 4;
+	int CardWidth = 8;
+	for (int i = 0; i < 4; i++) {
+		DrawBox(CardRow + (i * (CardHeight+2)), 81, CardWidth, CardHeight);
+	}
+
+	MoveCursor(2, 3);
+
+	if (CurrentAuction->AuctionItem) {
+		printf("%s\n", CurrentAuction->AuctionItem->Name.c_str());
+		printf("%s\n", CurrentAuction->AuctionItem->Description.c_str());
+		printf("감정가 : %.0f\n", CurrentAuction->AuctionItem->RealValue);
+		printf("경매시작 범위: %.0f ~ %.0f\n", CurrentAuction->AuctionItem->MinValue, CurrentAuction->AuctionItem->MaxValue);
 	}
 
 	int key = _getch();

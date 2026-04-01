@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Player.h"
 #include "NPC.h"
 #include <vector>
@@ -18,6 +18,8 @@ public:
 	vector<NPC*> Npcs;
 
 	Item* AuctionItem;
+
+	AuctionSystem();
 
 	//경매 시작 함수
 	void StartAuction();

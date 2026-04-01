@@ -1,19 +1,33 @@
-#include "AuctionSystem.h"
+﻿#include "AuctionSystem.h"
+
+AuctionSystem::AuctionSystem()
+{
+	StartAuction();
+}
 
 void AuctionSystem::StartAuction()
 {
-	AuctionItem = nullptr;
-
 	if (AuctionItem) {
 		delete AuctionItem;
-		AuctionItem = new Item();
+		AuctionItem = nullptr;
+	}
+
+	AuctionItem = new Item();
+
+	for (int i = 0; i < 3; i++) {
+		NPC* Npc = new NPC();
+		Npc->SetMaxValue(AuctionItem);
+		Npcs.push_back(Npc);
 	}
 }
 
 void AuctionSystem::EndAuction()
 {
+	AuctionItem = nullptr;
+
 	for (NPC* Npc : Npcs) {
 		delete Npc;
 		Npc = nullptr;
 	}
+
 }

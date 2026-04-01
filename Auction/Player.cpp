@@ -1,4 +1,4 @@
-#include "Player.h"
+﻿#include "Player.h"
 #include "Item.h"
 
 bool Player::PutItemToInventory(Item* NewItem)
@@ -8,4 +8,20 @@ bool Player::PutItemToInventory(Item* NewItem)
 	Inventory.push_back(NewItem);
 
 	return true;
+}
+
+bool Player::PurchaseItem(Item* NewItem)
+{
+	//돈 없음
+	if (NewItem->CallValue > CurrentMoney) return false;
+
+	//인벤토리 넣기 시도
+	if (PutItemToInventory(NewItem)) {
+		//성공하면 돈 차감
+		SpendMoney(NewItem->CallValue);
+		return true;
+	}
+
+	//풀 인벤
+	return false;
 }

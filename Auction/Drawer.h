@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <stdio.h>
 #include "AuctionSystem.h"
@@ -14,3 +14,5 @@ void DrawMainMenu();
 
 //경매 틀 그리기 함수
 void DrawAuctionScreen(AuctionSystem* CurrentAuction);
+
+//
