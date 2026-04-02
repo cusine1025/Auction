@@ -1,6 +1,11 @@
 ﻿#include "Player.h"
 #include "Item.h"
 
+Player::Player()
+{
+	AddMoney(5000000);
+}
+
 bool Player::PutItemToInventory(Item* NewItem)
 {
 	if (Inventory.size() >= 20) return false;

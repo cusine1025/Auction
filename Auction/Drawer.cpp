@@ -3,6 +3,10 @@
 
 #include <Windows.h>
 #include <conio.h>
+#include <string>
+#include <sstream>
+
+using namespace std;
 
 //플레이어 입력
 #define KEY_UP 72
@@ -33,6 +37,26 @@ enum {
 	WHITE,
 };
 
+vector<string> messages = {
+	"경매를 시작합니다!",
+	"흥미로운 물건이 나왔군요.",
+	"이건 아주 희귀한 물건입니다!",
+	"이 물건의 가치를 알아보실 수 있으실까요?"
+};
+
+string MoneyFormat(float value) {
+
+	// 소수점 버리고 정수로 변환
+	string s = to_string((long long)value); 	
+	int insertPos = s.length() - 3;
+
+	while (insertPos > 0) {
+		s.insert(insertPos, ",");
+		insertPos -= 3;
+	}
+	return s;
+}
+
 void MoveCursor(int row, int col) {
 	printf("\033[%d;%dH", row, col);
 }
@@ -58,6 +82,17 @@ void DrawBox(int row, int col, int width, int height)
 	printf("└");
 	for (int i = 0; i < width - 2; ++i) printf("─");
 	printf("┘");
+}
+
+void DrawAsciiArt(int X, int Y, const string& AsciiArt) {
+	stringstream ss(AsciiArt);
+	string Line;
+	int CurrentY = Y;
+
+	while (std::getline(ss, Line)) {
+		MoveCursor(CurrentY++, X); // 한 줄 내려갈 때마다 X좌표는 고정, Y좌표만 +1
+		printf("%s", Line.c_str());
+	}
 }
 
 void DrawMainMenu()
@@ -132,54 +167,138 @@ void DrawMainMenu()
 	}
 }
 
-void DrawAuctionScreen(AuctionSystem* CurrentAuction)
+const int SLOT_ROW = 7;
+const int SLOTW_WIDTH = 30;
+const int SLOT_HEIGHT = 6;
+
+void DrawAuctionScreen()
 {
-	system("cls");
+	AuctionSystem Auction = AuctionSystem::GetInstance();
+	bool IsPlaying = true;
 
-	//전체 프레임
-	DrawBox(1, 0, 120, 50);
+	while (IsPlaying) {
+		system("cls");
 
-	//로그 섹션
-	DrawBox(36, 0, 120, 15);
+		//전체 프레임
+		DrawBox(1, 0, 120, 45);
 
-	//슬롯 섹션
-	DrawBox(1, 89, 32, 36);
+		//로그 섹션
+		DrawBox(31, 0, 120, 15);
 
-	//참가자 슬롯
-	int SlotRow = 12;
-	int SlotWidth = 30;
-	int SlotHeight = 6;
-	for (int i = 0; i < 4; i++) {
-		DrawBox(SlotRow+(i*SlotHeight), 90, SlotWidth, SlotHeight);
+		//물건 그리기
+		//물건 이름 칸
+		DrawBox(1, 0, 30, 3);
+		//물건 설명 칸
+		DrawBox(31, 0, 120, 3);
 
-		MoveCursor(SlotRow + (i * SlotHeight) + 1, 92);
-		//플레이어 데이터 쓰기
-		if (i == 0) {
-			printf("당신");
+		//슬롯 섹션
+		DrawBox(1, 89, 32, 31);
+
+		//참가자 슬롯
+		for (int i = 0; i < 4; i++) {
+			DrawBox(SLOT_ROW + (i * SLOT_HEIGHT), 90, SLOTW_WIDTH, SLOT_HEIGHT);
+			MoveCursor(SLOT_ROW + (i * SLOT_HEIGHT) + 1, 92);
+			//플레이어 데이터 쓰기
+			if (i == 0) {
+				printf("당신");
+			}
+			//NPC 데이터 쓰기
+			else {
+				printf("NPC%d", i);
+			}
 		}
-		//NPC 데이터 쓰기
-		else {
-			printf("NPC%d", i);
+
+		//지갑 그리기
+		//지갑 섹션
+		DrawBox(1, 89, 32, 6);
+		MoveCursor(2, 91);
+		printf("당신의 지갑");
+		
+
+		//경매 시퀀스 시작
+		while (true) {
+			UpdateItem(Auction.AuctionItem);
+
+			UpdateWallet(Auction.CurrentPlayer);
+
+			int Index = 0;
+			for (Participant* Part : Auction.Participants) {
+
+				if (Part) {
+					
+					if (NPC* Npc = dynamic_cast<NPC*>(Part)) {
+						Npc->HandleItem(Auction.AuctionItem);
+						Sleep(500);
+					}
+
+					UpdateSlot(Part, Index);
+				}
+
+				Index++;
+			}
+
+			int key = _getch();
+
+			Auction.JoinParticipants();
 		}
 	}
+	
+}
 
-	//낙찰카드
-	int CardRow = 13;
-	int CardHeight = 4;
-	int CardWidth = 8;
-	for (int i = 0; i < 4; i++) {
-		DrawBox(CardRow + (i * (CardHeight+2)), 81, CardWidth, CardHeight);
+void UpdateItem(Item* NewItem)
+{
+	if (NewItem) {
+		//이름 출력
+		MoveCursor(2, 3);
+		printf("                         ");
+		MoveCursor(2, 3);
+		printf("%s", NewItem->Name.c_str());
+		//시작가 범위 출력
+		MoveCursor(2, 33);
+		printf("                                                 ");
+		MoveCursor(2, 33);
+		string MinValue = MoneyFormat(NewItem->MinValue);
+		string MaxValue = MoneyFormat(NewItem->MaxValue);
+		printf("시작가 범위 : %s 원 ~ %s 원", MinValue.c_str(), MaxValue.c_str());
+
+		//설명 출력
+		MoveCursor(32, 3);
+		printf("                                                            ");
+		MoveCursor(32, 3);
+		printf("%s", NewItem->Description.c_str());
+
+		//아스키 아트 출럭
+		DrawAsciiArt(30, 5, NewItem->AsciiArt);
 	}
+}
 
-	MoveCursor(2, 3);
-
-	if (CurrentAuction->AuctionItem) {
-		printf("%s\n", CurrentAuction->AuctionItem->Name.c_str());
-		printf("%s\n", CurrentAuction->AuctionItem->Description.c_str());
-		printf("감정가 : %.0f\n", CurrentAuction->AuctionItem->RealValue);
-		printf("경매시작 범위: %.0f ~ %.0f\n", CurrentAuction->AuctionItem->MinValue, CurrentAuction->AuctionItem->MaxValue);
+void UpdateSlot(Participant* Part, int Index)
+{
+	MoveCursor(SLOT_ROW + (Index * SLOT_HEIGHT) + 3, 92);
+	printf("                    ");
+	MoveCursor(SLOT_ROW + (Index * SLOT_HEIGHT) + 3, 92);
+	if (Part->GetState() == STATE::READY) {
+		printf("대기");
 	}
+	else if (Part->GetState() == STATE::DROP) {
+		printf("포기");
+	}
+	else {
+		string Money = MoneyFormat(Part->GetCallValue());
+		printf("입찰가 : %s 원", Money.c_str());
+	}
+}
 
-	int key = _getch();
+void UpdateWallet(Player* Player)
+{
+	MoveCursor(4, 91);
+
+	if (Player) {
+		string Money = MoneyFormat(Player->GetCurrentMoney());
+		printf("%s 원", Money.c_str());
+	}
+	else {
+		printf("엥... 지갑이 없는디요...");
+	}
 }
 

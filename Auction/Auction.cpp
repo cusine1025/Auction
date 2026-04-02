@@ -24,12 +24,12 @@ int main()
 {
 	//콘솔 설정
 	SetConsoleTitle(L"레전드 경매 게임");
-	system("mode con:cols=122 lines=55");
+	system("mode con:cols=120 lines=45");
 	FixConsoleSize();
 	
-	AuctionSystem* Auction = new AuctionSystem();
+	AuctionSystem::GetInstance();
 	//Auction->StartAuction();
-	DrawAuctionScreen(Auction);
+	DrawAuctionScreen();
 	//DrawMainMenu();
 }
 

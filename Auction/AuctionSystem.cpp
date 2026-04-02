@@ -2,10 +2,20 @@
 
 AuctionSystem::AuctionSystem()
 {
+	Player* MainPlayer = new Player();
+	SetPlayer(MainPlayer);
+
 	StartAuction();
 }
 
-void AuctionSystem::StartAuction()
+void AuctionSystem::JoinParticipants()
+{
+	for (Participant* Part : Participants) {
+		Part->SetState(STATE::JOIN);
+	}
+}
+
+void AuctionSystem::SetNewItem()
 {
 	if (AuctionItem) {
 		delete AuctionItem;
@@ -13,11 +23,19 @@ void AuctionSystem::StartAuction()
 	}
 
 	AuctionItem = new Item();
+}
+
+void AuctionSystem::StartAuction()
+{
+	SetNewItem();
+
+	Participants.push_back(CurrentPlayer);
 
 	for (int i = 0; i < 3; i++) {
 		NPC* Npc = new NPC();
 		Npc->SetMaxValue(AuctionItem);
 		Npcs.push_back(Npc);
+		Participants.push_back(Npc);
 	}
 }
 
